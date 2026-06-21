@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+
+  <!-- iPhone / iPad: open from Home Screen without browser chrome -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Noise">
+
+  <title>Noise</title>
+  <!-- App icons are embedded as data URIs, so the page does not depend on the host favicon. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='black'/%3E%3Cpath d='M46 75h24l32-28v86l-32-28H46z' fill='white'/%3E%3Cpath d='M124 64c13 13 13 39 0 52' fill='none' stroke='white' stroke-width='12' stroke-linecap='round'/%3E%3Cpath d='M142 48c22 22 22 62 0 84' fill='none' stroke='white' stroke-width='12' stroke-linecap='round' opacity='.72'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAcUlEQVR42u2UwQrAIAxDTfH/f7k7DETcaG2x7LC826RLQg22RghJoqqbk1KqnjFw1VV1npGQ9E52AHMOORLc8EZ6FXfSZX4cjk+p7hsNvjfooZLYlVt+cWrqFvdV7ukXWBEAQ/TYHbgexrqqHlRCfs8Fqao8BUjQGjIAAAAASUVORK5CYII=">
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAACXBIWXMAAAsTAAALEwEAmpwYAAAE9WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgMTAuMC1jMDAwIDc5LmQwNGNjMTY5OCwgMjAyNS8wNy8wMi0xMjoxODoxMyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI3LjMgKE1hY2ludG9zaCkiIHhtcDpDcmVhdGVEYXRlPSIyMDI2LTA2LTIxVDEzOjAxOjA3KzAyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNi0wNi0yMVQyMTowNToxNyswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNi0yMVQyMTowNToxNyswMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTQwOWYwMjgtY2FlZS00ZTYzLWEyNDktNzQ5MjgxMTMyNjg0IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjE0MDlmMDI4LWNhZWUtNGU2My1hMjQ5LTc0OTI4MTEzMjY4NCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjE0MDlmMDI4LWNhZWUtNGU2My1hMjQ5LTc0OTI4MTEzMjY4NCI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MTQwOWYwMjgtY2FlZS00ZTYzLWEyNDktNzQ5MjgxMTMyNjg0IiBzdEV2dDp3aGVuPSIyMDI2LTA2LTIxVDEzOjAxOjA3KzAyOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjcuMyAoTWFjaW50b3NoKSIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7ACcm6AAAN5ElEQVR42u2dd6xU5RbFD0jvUqWKCAhSpZdQhGAIQiihBpQOoYh0CD30XkxUCCAC0gWBBEJX6b1XkaD03nub9wv3PTJv5pwp986dcmatP170xZs5c741325r720YgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIgiAIghAI5MqVq1y5clWrVi1VqlSmTJnee++98Hm2bNmylS5dmmcrU6ZM1qxZEydOrPMKEpIlS1ayZMnx48f/+eefR44cWbdu3cCBA4sUKZIkSZJweLzChQsPHTp048aNhw4d2rRp04gRI6BI8uTJdXDxjsyZMzds2JCX/uzZM8f/8ObNm9mzZ+fJkydBggShfbzcuXMvWLDgwYMHzs+2bNmy4sWLh/zZbI6PP/54wIABly9ffv36teP/8fjx48aNG6dIkSK0TzhkyJAbN264PNuTJ0+6deuWOnVqnWC8IGnSpEWLFv3pp59evHjhsMCkSZNy5MgRwofkbuBKM31CnrxAgQI6x8C/8YwZM9auXXv79u3uF4bLAWBZQvioCRMmxM8wfbZff/0Vy6LTDPDr/uijj/r373/r1i2HN4gcUXRhEJUUKlRozpw5Dt8gckTLhZEhQ4Yvv/xyx44dDp8hctgfpLM+/PBDTMnt27cd/kDksLkpISrBlMydO9fhP0QOO5uSdOnS1apVa9euXY5YQeSwrSmhVkKCy19TInLYHIkSJfr0009/+eUXXxhAtpGEtMgRFU4GSWUSXHv27PFKCzJg5Mg7d+788OFDkcP+zMiePfvgwYPv3LnjlRmvXr3CF6EOTvnbKiEmctgHRCWLFy/2xZTAjO+//55XH3MAIoedQe20Xr16mBLPtZJ35dZ27dq90/KIHIa9FVzDhw+/fv26V2ZQ3kTOU7ZsWTxW5wMIJjnSpk3bqVOnJUuWrF69msfOnz+/yBFfKFGiBC/66dOnVhHHOzx69Gjq1Km4qy76v2CSAwHAqlWruLpevAWPjVYD91nkCDBSpkyJGGfnzp3Pnz/3akq4Vzp06JAqVSrTAwgOObJkyYJAxOVp4fTZs2f5LiJHwMCZjR49+t9///Ug1XmXxtiwYUOVKlWsNF1BIwepl3Pnzrl/CnRp0qRJjHcscsQV5cuXX7p06f379706GaRHJ0yYwE/Wg1w7aOTAAhIlmYZOZHJFjrgCu9C8efOtW7ditr2aEu6Vjh07Uqn3GhEEhxwI3K3iaoSipuQA69evN7Wbs2bN+uSTT0SJ/yJfvnxjx479+++/vToZZDzXrFlTo0aNNGnS+BIuhjM5+vbte+3aNXfnGhcq5OLncEGlSpUwJZgJr6bk6tWrcAhFP8V6H3MJ4UwO5K4zZ868d++ec9YfMVvBggWjqzWBJiJCTV4HWXBON2/evAisaemh/IEpsaqAOOPMmTNkET744AO/Ek3hTA6QM2dOGhF+++038v1Ewt9++y2vJUwargIJzr5YsWJE9u3bt8cLI7Sjd4grYe3atb///jtycELT3bt37927d//+/QcOHDh48ODhw4cvXLjg3HFkCvxTXhxCwPfff9/fLGSYkwOkT58eq8rvhP/lC4ZVq6YRxwI676Vr167wgAuAIz916tT58+e5/zET9HKRC3r58qXXLJYHwB4iWxy0WDQJRgQ5bAiOiktixowZ+/bt++eff3yxC7HA0aNHsTux7j4SOYzgC7FoD8Ex5OSc+zwDi7t3765YsaJu3bpe41WRI1xAxon8zKJFi9ybPAMIDNOoUaPohY9jRCdyBBV410j0iMXjjxk4ql26dOGDjECUxUWOIIEbvl+/fs5xeXwAqQ4RrxEgzYTIESSDQraKJGa8MoO4hgEmRuAENSJHMMC0pEGDBvl4xjiqFy9ePHHiBAquP/74g3k6K1euJOfBrBJ6kIh78SqsyIFMJhzIgc6ofv36GLi2bdtWqFDBc7Y+LuTAtWrRogWpsK+++go1JE2/kUcOMnebN2/28Is/fvz48uXLJ0+eTMmAPFizZs2INb744gumXVFrZRgXniypHnLDJC2oOYUzOZi99N1335GsI0r/66+/GKTRu3dvD25QrMnBK0Iby6ujlMhviZ8QQhZ/c31GyDvMKlasaPqiOU7+fzjRoEEDKteMP/Na+KBwAI3Clhz8DH788UcXmTuyHZL3zhrEuJODCwnakSd0/hPawfk5RZIlIuUFo63Em/Pnz/er5BHm5ECi7O5accw8MyWhAJKDy4l0jrs+iA4MjHjEkIP8f48ePawE340aNTL8bEIJW3LwbGTrTcs91MawkoEiBx9EwcFUIsSPDecjYsjBxTBy5Egr3xNPwk7kmDJliumfUDmiScL0g3CnTJPFnH337t1trgTDF5s2bZrpNyHt4W9awn7kYHIhjRGmvxyccVNxhn3IwYAUamxW5PBRemNjchDotm7dmojDxRsjm2wlzrAPOai0IWy0qpD561rbjxyA+LNXr17cH8jQYQlhMJouJl7av2+F92g1QIeQz/C/K9p+5IiJ6T7//HMiXgRdJNCYnxwVHW/YVFxoq5tD5IjqXlnMCm9TN4fIIXKIHCKHyCFyiBwih8ghcogcIkckkgNdPkvaqPgzkYGcsudGG5EjishBmhw5C1MhSJLS2Pfzzz8jcGHMssgR7eRAYMtkSzjhosz45ptvrGoLIke0kIOePPehynyXmzdvYmhEjqgmByJhRpO5/wl9wujKbK7nEDk8kyMWSjCRQ+QQOUQOkUPkEDlEDpFD5BA5RA6RQ+QQOUQOkUPkEDlEDpFD5BA5bEwORg8sXLhQfSsih2Ha8UZzn8ghcpiAUfbqlRU5DKsueyYhWXXZ+ztKVuSwFTlQOjH1y2Gx0oA5YCJH9JKDVWpDhw51WKxOYvaeyBG95IhZp+uwWNHI2inbkAPwAKbzu5nzV61atQDOBGOUoOkGTJ6N/gYjgsYXswvH9Psjk9yyZYudpgmy7PPIkSPuQ/6YUMINGsBpglzG7vsF+LExsJbNRhFDDo4T6T0TW02Pk98ZS/natGmDztbDIs9IIQdDVzjRS5cuOT8VC6awKVbHHDtykFpkpLPzpDk+aNmyZZ999lmE7XjjVTKf2mEB3gKTfplkjb2MGWKM6rphw4Y1a9asXLkyK+b5wjHji7kww3+CMdEZZpSFL0xv2rZtG7P6uTg9dCjFeoIxP6dhw4Zt3LgR/wMrw9x33lXkrYbE7WCVq8MHENwy+Jx9fVzO7HFitRsDNzE9fPkNbwEz3Fdmhtvsc0av4hUyTJjRzfyXnkeSx2X2ObEeHj3zoqAFTS6+XL1GGC5o4mWxx88Rz9DWBCNCl0Yz7p7lfvFKDvw+jLHIEXnAWWPBVrzu48HtZSAuTckihxFxu0Kp0DId3GUga2BBgMeiCdZNxHG5hMgRAueDrdJsVMHHJiiPJ34wb5/oka1hTLkUOSIMjLSuUqUKm6dXr14df7u92DhMMptXL3JEJEUIw1q2bIkjMm/ePMJUdjuyoot11KQU47KI+h04XUxMnTp1iC1FDiNC1wNy/7MhkHE2WBymgJPbGT9+PPtmpk+fzlI3YhBmICMnYyft4rfgH/hXsiBe3VuMFyamT58+/pqYiCAHK+xr1arVtGlT8mx8QX+3DEQwY6gRsHCDPA/79AhQcWZ5F2RI879FzHtBRnTlyhWvV8jly5fJvfplYsKfHJjmH374gTWJ5Jf5AfAqyCl7XjYYXWArEVbp5MmTpiVKFzEzVw6vz8coJszJwU6FVatW4Xo7/wmmmRUt0W6JXFLI1GIIf9x3nrmAdXmk5Hv27OnL0YY5OcaNG4dz5vInbBCjMhULB8vOoHhBfYEzw3z4kgiZNGkSxbzIJQd1V+qUCB7c/4pJhFQoRQnDfW0nJubUqVNeTQyVbqrE1atX9zzOMTjkoOrkYh3ekQPf3OZKMCO4ywYxMVRxvUYxRMtEzkhjqLCHlhx41jiV7p+C0gX62nzHW/BNDG48nTK+RDEonCdOnIgwIoTkwEFmO5OLDgGTgQbKKjQVOeL6c6SIQ4zn1cTgpfJCEV4gOgkJOQBrgnnao0ePQmjGTvLYa9euRaJh/wnGRuiKwKgP0QpxPXjmB9b92LFjyLfooggJOUDKlCnJ5LJPGklKq1atPHdsiBxGQDL0XAnk5q3EYy5eCNPHSbLFmPkgkyNKtyYYYdCPSRRD1cY09nPG69evySwRW5JnpIAsckQFMmTIwF3N8HnaqLxeIadPn27bti0mhqSqyBEVYG0FHRLI+a3uAxeQKLNSnIgchl1z7SNHjiQo8GpiPEDksC0IWVu0aEEGzDQvKXJEO1CzUtWkSOs1yhU5ohRUL2mCorZJnkPkEFxB82Djxo2p1ZHkEDkEw10QT66dd0oeXeQQTMCqToSriGV8ETaLHNHopdIKRcMVeVKRQzDcFVb0XK1cudIzP0SOqPZC0OdhYqzIMWbMGH/n3AUc1PRNnegZM2bgQukQjXhtjMDEnD171v0KQWNWo0YNbFBon7Br167uglnkj19//XVETumIxFYr1gE7V1jgCsO4rKZ7GcFVI9CJ4yxAJ1vDhIFATaAQvJt2avdUaJcsWYIuld472qhInYVJYwgjT5hPRzsgY4/QrDRq1AgJrZpWgh3lIvOk6I9UndJuWI1jQzDLU8U8G3dJhI2KEwRBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEARBEAT74D9Azmixef+hhAAAAABJRU5ErkJggg==">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Noise%22%2C%22short_name%22%3A%22Noise%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAACVUlEQVR42u3cQZKjMAxAUXDl/lemF71LZQFYxsh67wC0nfwSJpnJtgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADww3EcZffevP3qEZB6BKSenD5eAumYQOoRkHoEpJ6CGxFQrXqO4/jfSNR2BFSrnvBNCahoPVFbE1DdekI26HMgR2YTSD19G%2BnZrIBWrucBAlJP164FtHg9%2B76bQOp5oqF72xeQc48J1J3O8vWMG0JNPUWWPegw1NSTdNmDFn/1sk09ee%2B2b9hCU0/qNV/ayIi7WFOPNff8raae7GueO4SaeqxZQJePn4vVE7618xdsRepJuvIRx97Yazb1rNHQrG1%2BvOWYQIt78xASkCK7chRQ3dO0CYSAmHHfERAmEALCDVFAmEDGxrxztIAQEAJCQAgIBISAEBACAgEhIASEgJjvzBelD//raQEhIOYNMwFhAiEgMp6gBYSAjB8BkfduKKB1xs%2BUH2B44w9Mxb4Qfq7KLexFORo/FW9h%2B74nzWjE%2BIy9ZqEzUMaGTq45fGvnL1jrEL1wQ85A3o%2Bba760o/B7YsXHeHMo8G8V/RxomYbmjp%2Bt8geJGR/Nvtb8hvVX/yQ67ygatPKrl/VVRpUj0aBP5AWUtaER9dx4HQRUpSFnIA29bvwIaIVHsylHHwG5ncVsWUAaMoE01LeLnp0KSEMmkIY6dtG5QQFVeTTr/y5WQNVH0dcWQnYkoHINxX4XKyBHIgFpaB4BaUhAHs0EZBRRl/9%2BDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKzlD%2BsxC8YWEdTBAAAAAElFTkSuQmCC%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/png%22%7D%2C%7B%22src%22%3A%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAIVElEQVR42u3dUXLcSg5FQdHR%2B98y/akfR8tqklUAbuYC5oVUIA5LLY2/vgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICOzvP0TaCgP74FYPsjAIDtjwAAtj/TvXwLwOrHDQCw/REAwPZHAADbHwEAbH8EALD9EQCw/X0T6MivgYLVjxsAYPsjAIDtjwAAtj8CANj%2BCADY/iAAYPuDAIDtD334OwCw%2BvlwJI7jcAMA25/Ekeg%2BHgIAtj%2Bfj0TrIREAsP0JHQkBANufn%2BfhzUj0nRYBANufq/PQdGYEAGx/bpiHjpPj10DB6id0JNwAwPbnnpFoN0UCALY/t41Er1kSADzqtj%2BhIyEAeNThex6uj0SjoRIAbH%2B4eR66jJYA4GmH0HkQAFzzMRJni/9NAQAvevQYifrDJgB41DESoQQAjzpGInTqBACPOkbCDQA86mTMw8qRqDx%2BAoDtj3lwAwBPO9Nt%2BWfcy86hAOCajwaENkAA8OKPBoQSAGx/NCB0MgUA2x/cAMD2xyUgaUQFANsfDXADANsfBAAarX7bn0aXgFLjKgB48UcDQn8QJADY/hA6ugKARwhCLwECgO0PoTMsAHhyqHW%2Bu4448BIgANj%2BlDtfBy0AUOLFkC1133LcKy8BFeZZAPDiT9Ejdu4CgNVgC%2BQe8frTj7oECAC2P47YDQCsBuod8exLgACA7e%2BIQ4dh75cmAHgq2HC%2Bvz3ixSMRcgl4mUWsfhxxJjcArAZ6HPHUS8DGsRcAbH/aHLEhEQCsBhwxAoDVQNgRr5yW8T8FEgBsfxyxGwBYDXQ4YmMjAFgNOOLHzf4pkACwZy/Y/ra/twc3AOwFnDICgL2AU643S4P/byEEANsfpxz6rRMA7AW6nrKhEgDsBXjW1J8CCQC2P40XpekSAOqufs%2BnBlC2ZwKAVzN6N8CkCQC2P7jZ/I5/Ecy6hEfWpal2AwC8MnuFKvq1CACAGwCAS0CNL0cAABAAwCUAAQD4pzEfBS/7QgQAcAkIvdAIAEAoAQAQAIBnzP6n1QUAAAEA2HcJmGHNVUYAAEJLJgCAd%2BdQAgAgAABP8jGAAAAgAAAP8DGAAADImAAANcz4GGDMhxkCABBKAAAEAAABAGjNLwIJAFCOPwcTAAAEAAABAEAAANI9/VG2AAD82oyPsgUAIJQAADNfn/0pgAAAIAAACAAAAgAgAAAIAAACAIAAACAAAAgAAAIAgAAAIAAACAAAAgCAAAAgAAAIAAACAIAAACAAAAgA0Ml5ngv%2BK8dx%2BFYLAAACAIAAAHxszU%2BxBAAg1NMfYwgAQCgBABAAgOfN%2BOm5AAAU5Y8ABAAAAQBAAAAQAGApnwALAICMCQDA3Wb8CtCCr0IAAEIJALCIDwAEAAABALibvwEWAAAEAChgzAcAkz7JEACActb8IEsAgDlvzT4AEAAABAAAAQC28PdfAgDwrAUfAAyLmQAANmZcyQQAIJoAABNe//0CqAAATOiZAADWpdf/B718CyqYN74%2B%2BrP9fRPqbwM3ACQNQgkAGkDv1/81kzbyTiMAPPtkyoDtjwDgKoDtb7pqfTkCgKcU3ABAA2h1ysv%2Bc1N/riUAaABO2Q0AbAf6nPK8WVr/FQkAGoBTfmfw7zUJAHu2gwxogMAIABYEjhgBwILAERcbm2U//9nyLAgAGoAjdgMAC4LyR2xaBAALAkf8uNk//xEALAg6HbEhEQAsCBKP2HgIAPMXhOdcAyoY//MfAcCOoEfmjYQAoAEkHvH6YQj5Z20EAA2g9BHPHoO9X50A4PHAESe%2B/gsAFgSlj9jpCwAWhC2QeMRbzn3l6//2wRYA2iwIGYhqgOMWAHAVSDzfXQcd9fovAGgArnpuAKABZMv55R8BQAMgfYAFAI8QJL7%2BCwAaALlzKwC0f5ZkAK//AoBXKqi%2B/UvNqgCgARBKANAAvP4LAGgAtn/SfAoAGgBuAKABeP1PGksBYGwDZIA6298NAFwFCN3%2BNUdRANAAbP/QIRQANADDEEoA8NgTNwwr56Hy7AkAGoB5cAMAzzzmIWnkBADPPObBDQBinnkZYEED6o%2BZAOCxxzAcmQMmAHjsIXQYBACPPdw8DF3mSgDw2GsA38NwfR4aTZQAgAYQOg8CABrAbfPQa5AEAO68/pPcgHbzIwDgKkDoMAgAaAA3DEPHsREA0ACuDkPTgREA0AB%2BHoY389B3VAQANIDQeRAA0AA%2Bn4fWEyIAcOn6T3IDug%2BGsYb/deXfE5cQ3ABg1PUfBAA0AAQANAAEADQABAA0AAQANAAEAAY0QAYQAHAVAAEADQABAA0AAQANAAEADQABAA0AAYBRDZABBABcBUAAQAMAiHLlX5IBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAZv4Ch4vDEaQPGx4AAAAASUVORK5CYII%3D%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%7D%5D%7D">
+
+  <style>
+    :root {
+      --icon-size: 96px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      touch-action: manipulation;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #000;
+      cursor: pointer;
+    }
+
+    #iconLayer {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    .status-icon {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      opacity: 0;
+      transform: scale(0.88);
+      pointer-events: none;
+      will-change: opacity, transform;
+      animation: icon-pop 760ms ease-out both;
+    }
+
+    #hint {
+      position: fixed;
+      left: 24px;
+      right: 24px;
+      bottom: calc(24px + var(--safe-bottom));
+      opacity: 0.45;
+      font-size: 14px;
+      line-height: 1.35;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 240ms ease;
+    }
+
+    #hint.hidden {
+      opacity: 0;
+    }
+
+    @keyframes icon-pop {
+      0% {
+        opacity: 0;
+        transform: scale(0.86);
+      }
+      22% {
+        opacity: 1;
+        transform: scale(1.04);
+      }
+      62% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.08);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" aria-label="Sleep noise. Tap to mute or unmute.">
+    <div id="iconLayer" aria-hidden="true"></div>
+    <div id="hint">Tap to start sleep noise</div>
+  </main>
+
+  <script>
+    const app = document.getElementById('app');
+    const iconLayer = document.getElementById('iconLayer');
+    const hint = document.getElementById('hint');
+
+    const DEFAULT_VOLUME = 0.26;
+
+    const COVER_ART_512 = 'data:image/png;base64,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LnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgMTAuMC1jMDAwIDc5LmQwNGNjMTY5OCwgMjAyNS8wNy8wMi0xMjoxODoxMyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI3LjMgKE1hY2ludG9zaCkiIHhtcDpDcmVhdGVEYXRlPSIyMDI2LTA2LTIxVDEzOjAxOjA3KzAyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNi0wNi0yMVQyMToxNzo1OSswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyNi0wNi0yMVQyMToxNzo1OSswMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NTMwMzY2MmYtMjc2MS00NDQ2LWJiODUtMzA0YTRhNjY5YmFkIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjUzMDM2NjJmLTI3NjEtNDQ0Ni1iYjg1LTMwNGE0YTY2OWJhZCIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElE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';
+
+    const soundSvg = `
+      <path d="M32.5,30v30-30ZM17.5,52.5c0,6.5,1.4,7.7,15,7.5l20,15V15l-20,15c-13.6.2-15,.8-15,7.5v15ZM72.5,35v-10M72.5,65v-20M62.5,55v-20M82.5,25v-10M82.5,75v-10M82.5,55v-20" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    `;
+
+    const muteSvg = `
+      <path d="M32.5,30v30-30ZM17.5,52.5c0,6.5,1.4,7.7,15,7.5l20,15V15l-20,15c-13.6.2-15,.8-15,7.5v15ZM84,56.5l-23-23M61,56.5l23-23" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    `;
+
+    let audioContext = null;
+    let sourceNode = null;
+    let lowpassNode = null;
+    let masterGainNode = null;
+    let started = false;
+    let muted = false;
+    let lastTapTime = 0;
+
+    // Experimental iOS path: keep a real HTMLMediaElement playing so iOS is
+    // more likely to allow audio in Ring/Silent mode. The media element is no
+    // longer the audible noise source; the actual sleep noise stays in Web Audio
+    // so it remains continuous and does not reveal a short WAV loop.
+    let unlockAudio = null;
+    let unlockObjectUrl = null;
+    let mediaStreamDestinationNode = null;
+    let outputAudio = null;
+
+    // Experimental iOS background path: route the Web Audio graph through
+    // a real HTMLMediaElement. The audible noise is still generated by Web
+    // Audio, but iOS treats the final output more like normal media playback.
+    // This improves the chance of surviving Lock Screen / background state
+    // without introducing a short looping WAV as the main sound source.
+
+    function shouldUseMediaUnlock() {
+      const ua = navigator.userAgent || '';
+      const platform = navigator.platform || '';
+      const isiPhoneOrIPad = /iPad|iPhone|iPod/.test(ua);
+      const iPadOSDesktopMode = platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      return isiPhoneOrIPad || iPadOSDesktopMode;
+    }
+
+    function createUnlockWavBlob() {
+      const sampleRate = 8000;
+      const seconds = 1;
+      const numSamples = sampleRate * seconds;
+      const bytesPerSample = 2;
+      const numChannels = 1;
+      const blockAlign = numChannels * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = numSamples * blockAlign;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      function writeString(offset, text) {
+        for (let i = 0; i < text.length; i += 1) {
+          view.setUint8(offset + i, text.charCodeAt(i));
+        }
+      }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      for (let i = 0; i < numSamples; i += 1) {
+        // A very low-amplitude tone. It keeps the media pipeline alive, but is
+        // practically inaudible under the generated sleep noise.
+        const t = i / sampleRate;
+        const sample = Math.sin(2 * Math.PI * 180 * t) * 0.0015;
+        view.setInt16(44 + i * 2, sample * 32767, true);
+      }
+
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    function buildUnlockAudio() {
+      unlockAudio = new Audio();
+      unlockAudio.loop = true;
+      unlockAudio.preload = 'auto';
+      unlockAudio.volume = 1;
+      unlockAudio.setAttribute('playsinline', '');
+      unlockAudio.setAttribute('webkit-playsinline', '');
+
+      const blob = createUnlockWavBlob();
+      unlockObjectUrl = URL.createObjectURL(blob);
+      unlockAudio.src = unlockObjectUrl;
+      document.body.appendChild(unlockAudio);
+    }
+
+    function makeNoiseBuffer(context) {
+      const seconds = 2;
+      const length = Math.floor(context.sampleRate * seconds);
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      let lastOut = 0;
+
+      for (let i = 0; i < length; i += 1) {
+        const white = Math.random() * 2 - 1;
+
+        // Brown/red-ish sleep noise. Lower multiplier = calmer movement.
+        lastOut = (lastOut + 0.016 * white) / 1.016;
+        data[i] = Math.max(-1, Math.min(1, lastOut * 3.4));
+      }
+
+      return buffer;
+    }
+
+    function shouldUseMediaStreamOutput() {
+      return shouldUseMediaUnlock() && typeof Audio !== 'undefined';
+    }
+
+    function buildOutputAudioElement() {
+      outputAudio = new Audio();
+      outputAudio.preload = 'auto';
+      outputAudio.volume = 1;
+      outputAudio.muted = false;
+      outputAudio.setAttribute('playsinline', '');
+      outputAudio.setAttribute('webkit-playsinline', '');
+      outputAudio.setAttribute('aria-hidden', 'true');
+      outputAudio.style.position = 'fixed';
+      outputAudio.style.left = '-1000px';
+      outputAudio.style.top = '0';
+      outputAudio.style.width = '1px';
+      outputAudio.style.height = '1px';
+      outputAudio.style.opacity = '0';
+      outputAudio.style.pointerEvents = 'none';
+
+      outputAudio.srcObject = mediaStreamDestinationNode.stream;
+      document.body.appendChild(outputAudio);
+    }
+
+    function buildAudioGraph() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioContext = new AudioContextClass();
+
+      sourceNode = audioContext.createBufferSource();
+      sourceNode.buffer = makeNoiseBuffer(audioContext);
+      sourceNode.loop = true;
+
+      lowpassNode = audioContext.createBiquadFilter();
+      lowpassNode.type = 'lowpass';
+      lowpassNode.frequency.value = 1150;
+      lowpassNode.Q.value = 0.5;
+
+      masterGainNode = audioContext.createGain();
+      masterGainNode.gain.value = 0;
+
+      sourceNode.connect(lowpassNode);
+      lowpassNode.connect(masterGainNode);
+
+      if (shouldUseMediaStreamOutput() && audioContext.createMediaStreamDestination) {
+        mediaStreamDestinationNode = audioContext.createMediaStreamDestination();
+        masterGainNode.connect(mediaStreamDestinationNode);
+        buildOutputAudioElement();
+      } else {
+        masterGainNode.connect(audioContext.destination);
+      }
+
+      audioContext.addEventListener('statechange', () => {
+        if (started && !muted && document.visibilityState === 'visible') {
+          recoverAudio();
+        }
+      });
+    }
+
+    async function ensureMediaElementPlayback() {
+      const mediaPromises = [];
+
+      if (outputAudio && outputAudio.paused) {
+        mediaPromises.push(outputAudio.play());
+      }
+
+      // Fallback for browsers where the MediaStream output path is not available.
+      // The helper is intentionally not used when outputAudio exists, so the tiny
+      // WAV tone cannot add extra colour to the main sleep noise.
+      if (!outputAudio && shouldUseMediaUnlock()) {
+        if (!unlockAudio) {
+          buildUnlockAudio();
+        }
+
+        if (unlockAudio.paused) {
+          mediaPromises.push(unlockAudio.play());
+        }
+      }
+
+      await Promise.allSettled(mediaPromises);
+    }
+
+    async function startAudioFromUserGesture() {
+      if (!audioContext) {
+        buildAudioGraph();
+        setupMediaSession();
+      }
+
+      // Important for iOS: start(), resume(), and media play() must happen
+      // directly after a tap/touch.
+      if (!started) {
+        sourceNode.start(0);
+        started = true;
+      }
+
+      const resumePromise = audioContext.state !== 'running'
+        ? audioContext.resume()
+        : Promise.resolve();
+
+      const mediaPromise = ensureMediaElementPlayback();
+
+      await Promise.allSettled([resumePromise, mediaPromise]);
+
+      muted = false;
+      fadeTo(DEFAULT_VOLUME, 0.22);
+      updateMediaSessionState();
+      hint.classList.add('hidden');
+    }
+
+    function fadeTo(value, duration) {
+      if (!audioContext || !masterGainNode) return;
+
+      const now = audioContext.currentTime;
+      const currentValue = masterGainNode.gain.value;
+
+      masterGainNode.gain.cancelScheduledValues(now);
+      masterGainNode.gain.setValueAtTime(currentValue, now);
+      masterGainNode.gain.linearRampToValueAtTime(value, now + duration);
+    }
+
+    function setMuted(nextMuted) {
+      muted = nextMuted;
+      fadeTo(muted ? 0 : DEFAULT_VOLUME, 0.14);
+      updateMediaSessionState();
+    }
+
+    function updateMediaSessionState() {
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = started && !muted ? 'playing' : 'paused';
+      }
+    }
+
+    function setupMediaSession() {
+      if (!('mediaSession' in navigator)) return;
+
+      if ('MediaMetadata' in window) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: 'Sleep',
+          artist: 'Noise',
+          album: 'Brown/red sleep noise',
+          artwork: [
+            { src: COVER_ART_512, sizes: '512x512', type: 'image/png' }
+          ]
+        });
+      }
+
+      try {
+        navigator.mediaSession.setActionHandler('play', async () => {
+          await recoverAudio();
+          setMuted(false);
+          showIcon(soundSvg);
+        });
+      } catch (error) {
+        // Some iOS versions expose Media Session only partially.
+      }
+
+      try {
+        navigator.mediaSession.setActionHandler('pause', () => {
+          setMuted(true);
+          showIcon(muteSvg);
+        });
+      } catch (error) {
+        // Some iOS versions expose Media Session only partially.
+      }
+
+      updateMediaSessionState();
+    }
+
+    async function recoverAudio() {
+      if (!started || muted || !audioContext) return;
+
+      try {
+        await ensureMediaElementPlayback();
+
+        if (audioContext.state !== 'running') {
+          await audioContext.resume();
+        }
+
+        fadeTo(DEFAULT_VOLUME, 0.08);
+        updateMediaSessionState();
+      } catch (error) {
+        // Recovery is best-effort. iOS may require a fresh tap after interruption.
+      }
+    }
+
+    function showIcon(svg) {
+      const nextIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      nextIcon.setAttribute('class', 'status-icon');
+      nextIcon.setAttribute('viewBox', '0 0 96 96');
+      nextIcon.innerHTML = svg;
+
+      iconLayer.replaceChildren(nextIcon);
+
+      nextIcon.addEventListener('animationend', () => {
+        nextIcon.remove();
+      }, { once: true });
+    }
+
+    async function handleTap(event) {
+      event.preventDefault();
+
+      // Avoid double toggles when iOS sends both touch and mouse/click-style events.
+      const now = Date.now();
+      if (now - lastTapTime < 300) return;
+      lastTapTime = now;
+
+      try {
+        if (!started) {
+          await startAudioFromUserGesture();
+          showIcon(soundSvg);
+          return;
+        }
+
+        await ensureMediaElementPlayback();
+
+        if (audioContext && audioContext.state !== 'running') {
+          await audioContext.resume();
+        }
+
+        setMuted(!muted);
+        showIcon(muted ? muteSvg : soundSvg);
+      } catch (error) {
+        hint.textContent = 'Tap again to allow sound';
+        hint.classList.remove('hidden');
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!started || muted) return;
+
+      if (document.visibilityState === 'visible') {
+        recoverAudio();
+      } else {
+        // Best-effort: keep the media element alive before iOS freezes JS.
+        ensureMediaElementPlayback();
+      }
+    });
+
+    window.addEventListener('pageshow', recoverAudio);
+    window.addEventListener('focus', recoverAudio);
+
+    // Use touchend first for old iOS Safari. Pointer events cover newer Safari and desktop.
+    app.addEventListener('touchend', handleTap, { passive: false });
+    app.addEventListener('pointerup', handleTap);
+  </script>
+</body>
+</html>
