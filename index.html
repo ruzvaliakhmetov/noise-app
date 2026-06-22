@@ -227,23 +227,147 @@
       document.body.appendChild(unlockAudio);
     }
 
-    function makeNoiseBuffer(context) {
-      const seconds = 2;
-      const length = Math.floor(context.sampleRate * seconds);
-      const buffer = context.createBuffer(1, length, context.sampleRate);
-      const data = buffer.getChannelData(0);
+    const ORGANIC_NOISE_PROCESSOR_CODE = `
+class OrganicSleepNoiseProcessor extends AudioWorkletProcessor {
+  constructor() {
+    super();
 
-      let lastOut = 0;
+    this.p0 = 0;
+    this.p1 = 0;
+    this.p2 = 0;
+    this.p3 = 0;
+    this.p4 = 0;
+    this.p5 = 0;
+    this.p6 = 0;
 
-      for (let i = 0; i < length; i += 1) {
+    this.brown = 0;
+    this.deepBrown = 0;
+    this.dcLastInput = 0;
+    this.dcLastOutput = 0;
+  }
+
+  nextSample() {
+    const white = Math.random() * 2 - 1;
+
+    // Paul Kellet-style pink filter. This keeps the sound soft without
+    // depending on a short repeating sample buffer.
+    this.p0 = 0.99886 * this.p0 + white * 0.0555179;
+    this.p1 = 0.99332 * this.p1 + white * 0.0750759;
+    this.p2 = 0.96900 * this.p2 + white * 0.1538520;
+    this.p3 = 0.86650 * this.p3 + white * 0.3104856;
+    this.p4 = 0.55000 * this.p4 + white * 0.5329522;
+    this.p5 = -0.7616 * this.p5 - white * 0.0168980;
+
+    let pink = this.p0 + this.p1 + this.p2 + this.p3 + this.p4 + this.p5 + this.p6 + white * 0.5362;
+    this.p6 = white * 0.115926;
+    pink *= 0.105;
+
+    // Two gentle leaky integrators add the brown/red sleep-noise weight.
+    this.brown = (this.brown + 0.014 * white) / 1.014;
+    this.deepBrown = (this.deepBrown + 0.0025 * (Math.random() * 2 - 1)) / 1.0025;
+
+    let sample = pink * 0.62 + this.brown * 2.15 + this.deepBrown * 0.75;
+
+    // Remove slow DC drift so the low end does not turn into pressure pulses.
+    const blocked = sample - this.dcLastInput + 0.995 * this.dcLastOutput;
+    this.dcLastInput = sample;
+    this.dcLastOutput = blocked;
+
+    return Math.tanh(blocked * 1.15) * 0.72;
+  }
+
+  process(inputs, outputs) {
+    const output = outputs[0][0];
+
+    for (let i = 0; i < output.length; i += 1) {
+      output[i] = this.nextSample();
+    }
+
+    return true;
+  }
+}
+
+registerProcessor('organic-sleep-noise', OrganicSleepNoiseProcessor);
+`;
+
+    function createOrganicNoiseGenerator() {
+      let p0 = 0;
+      let p1 = 0;
+      let p2 = 0;
+      let p3 = 0;
+      let p4 = 0;
+      let p5 = 0;
+      let p6 = 0;
+
+      let brown = 0;
+      let deepBrown = 0;
+      let dcLastInput = 0;
+      let dcLastOutput = 0;
+
+      return function nextSample() {
         const white = Math.random() * 2 - 1;
 
-        // Brown/red-ish sleep noise. Lower multiplier = calmer movement.
-        lastOut = (lastOut + 0.016 * white) / 1.016;
-        data[i] = Math.max(-1, Math.min(1, lastOut * 3.4));
+        p0 = 0.99886 * p0 + white * 0.0555179;
+        p1 = 0.99332 * p1 + white * 0.0750759;
+        p2 = 0.96900 * p2 + white * 0.1538520;
+        p3 = 0.86650 * p3 + white * 0.3104856;
+        p4 = 0.55000 * p4 + white * 0.5329522;
+        p5 = -0.7616 * p5 - white * 0.0168980;
+
+        let pink = p0 + p1 + p2 + p3 + p4 + p5 + p6 + white * 0.5362;
+        p6 = white * 0.115926;
+        pink *= 0.105;
+
+        brown = (brown + 0.014 * white) / 1.014;
+        deepBrown = (deepBrown + 0.0025 * (Math.random() * 2 - 1)) / 1.0025;
+
+        let sample = pink * 0.62 + brown * 2.15 + deepBrown * 0.75;
+
+        const blocked = sample - dcLastInput + 0.995 * dcLastOutput;
+        dcLastInput = sample;
+        dcLastOutput = blocked;
+
+        return Math.tanh(blocked * 1.15) * 0.72;
+      };
+    }
+
+    function createScriptProcessorNoiseNode(context) {
+      const processor = context.createScriptProcessor(4096, 0, 1);
+      const nextSample = createOrganicNoiseGenerator();
+
+      processor.onaudioprocess = (event) => {
+        const output = event.outputBuffer.getChannelData(0);
+
+        for (let i = 0; i < output.length; i += 1) {
+          output[i] = nextSample();
+        }
+      };
+
+      return processor;
+    }
+
+    async function createNoiseNode(context) {
+      if (context.audioWorklet && window.AudioWorkletNode) {
+        try {
+          const blob = new Blob([ORGANIC_NOISE_PROCESSOR_CODE], {
+            type: 'application/javascript'
+          });
+
+          const url = URL.createObjectURL(blob);
+          await context.audioWorklet.addModule(url);
+          URL.revokeObjectURL(url);
+
+          return new AudioWorkletNode(context, 'organic-sleep-noise', {
+            numberOfInputs: 0,
+            numberOfOutputs: 1,
+            outputChannelCount: [1]
+          });
+        } catch (error) {
+          // Fallback below. Some iOS/Safari builds are picky about blob modules.
+        }
       }
 
-      return buffer;
+      return createScriptProcessorNoiseNode(context);
     }
 
     function shouldUseMediaStreamOutput() {
@@ -270,13 +394,11 @@
       document.body.appendChild(outputAudio);
     }
 
-    function buildAudioGraph() {
+    async function buildAudioGraph() {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       audioContext = new AudioContextClass();
 
-      sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = makeNoiseBuffer(audioContext);
-      sourceNode.loop = true;
+      sourceNode = await createNoiseNode(audioContext);
 
       lowpassNode = audioContext.createBiquadFilter();
       lowpassNode.type = 'lowpass';
@@ -329,14 +451,13 @@
 
     async function startAudioFromUserGesture() {
       if (!audioContext) {
-        buildAudioGraph();
+        await buildAudioGraph();
         setupMediaSession();
       }
 
-      // Important for iOS: start(), resume(), and media play() must happen
-      // directly after a tap/touch.
+      // The noise node now runs continuously. Unlike AudioBufferSourceNode,
+      // it does not need start(), so there is no short loop to reveal itself.
       if (!started) {
-        sourceNode.start(0);
         started = true;
       }
 
